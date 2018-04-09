@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>天天生鲜-用户中心</title>
+	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/main.css">
+</head>
+<body>
+	<div class="header_con">
+		<div class="header">
+			<div class="welcome fl">欢迎来到天天生鲜!</div>
+			<div class="fr">
+                {% if request.session.user_name %}
+				<div class="login_info fl">
+                    欢迎您：<em>{{ request.session.user_name }}</em>
+                    <a href="/user/logout/">退出登陆</a>
+				</div>
+                {% else %}
+				<div class="login_btn fl">
+					<a href="/user/login/">登录</a>
+					<span>|</span>
+					<a href="/user/register/">注册</a>
+				</div>
+                {% endif %}
+				<div class="user_link fl">
+					<span>|</span>
+					<a href="/user/user_center_info/">用户中心</a>
+					<span>|</span>
+					<a href="/static/cart.html">我的购物车</a>
+					<span>|</span>
+					<a href="/user/user_center_order/">我的订单</a>
+				</div>
+			</div>
+		</div>		
+	</div>
+
+	<div class="search_bar clearfix">
+		<a href="index.html" class="logo fl"><img src="/static/images/logo.png"></a>
+		<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
+		<div class="search_con fr">
+			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
+			<input type="button" class="input_btn fr" name="" value="搜索">
+		</div>		
+	</div>
+
+	<div class="main_con clearfix">
+		<div class="left_menu_con clearfix">
+			<h3>用户中心</h3>
+			<ul>
+				<li><a href="user_center_info.html">· 个人信息</a></li>
+				<li><a href="user_center_order.html">· 全部订单</a></li>
+				<li><a href="user_center_site.html" class="active">· 收货地址</a></li>
+			</ul>
+		</div>
+		<div class="right_content clearfix">
+				<h3 class="common_title2">收货地址</h3>
+				<div class="site_con">
+					<dl>
+						<dt>当前地址：</dt>
+						<dd>{{ object.user_address }} （{{ object.user_receive_name }} 收） {{ object.user_mobile_phone_number }}</dd>
+					</dl>					
+				</div>
+				<h3 class="common_title2">编辑地址</h3>
+				<div class="site_con">
+					<form action="/user/user_center_site/" method="post">
+                        {% csrf_token %}
+						<div class="form_group">
+							<label>收件人：</label>
+							<input id="receive_name" type="text" name="receive_name" value="{{ object.user_receive_name }}">
+						</div>
+						<div class="form_group form_group2">
+							<label>详细地址：</label>
+							<textarea id="address" name="address" class="site_area">{{ object.user_address }}</textarea>
+						</div>
+						<div class="form_group">
+							<label>邮编：</label>
+							<input id="zip_code" name="zip_code" type="text" value="{{ object.user_zip_code }}">
+						</div>
+						<div class="form_group">
+							<label>手机：</label>
+							<input id="mobile_phone" name="mobile_phone" type="text" value="{{ object.user_mobile_phone_number }}">
+						</div>
+
+						<input id="ajax_submit" type="submit" name="" value="提交" class="info_submit">
+					</form>
+				</div>
+		</div>
+	</div>
+
+
+
+	<div class="footer">
+		<div class="foot_link">
+			<a href="#">关于我们</a>
+			<span>|</span>
+			<a href="#">联系我们</a>
+			<span>|</span>
+			<a href="#">招聘人才</a>
+			<span>|</span>
+			<a href="#">友情链接</a>		
+		</div>
+		<p>CopyRight © 2016 北京天天生鲜信息技术有限公司 All Rights Reserved</p>
+		<p>电话：010-****888    京ICP备*******8号</p>
+	</div>
+
+    <script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
+    <script type="text/javascript">
+        $(window).load(
+            console.log($('#address').val())
+        );
+        $('#ajax_submit').click(function () {
+            $.ajax({
+                url:'/user/user_center_site/',
+                type:'POST',
+                // 出于CSRF考虑 设置请求头
+                headers:{'X-CSRFToken':$.cookie('csrftoken')},
+                data:{
+                    'receive_name':$('#receive_name').val(),
+                    'address':$('#address').val(),
+                    'zip_code':$('#zip_code').val(),
+                    'mobile_phone':$('#mobile_phone').val()
+                },
+                success:function (data) {
+                    var obj = jQuery.parseJSON(data);
+                    if (obj.status){
+                        alert('提交成功');
+                        location.reload()
+                    }else{
+                        alert(obj.error)
+                    }
+                }
+            })
+        })
+    </script>
+</body>
+</html>
